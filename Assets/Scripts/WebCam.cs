@@ -32,16 +32,13 @@ public class WebCam : MonoBehaviour
         WebCamDevice[] devices = WebCamTexture.devices;
         for (int i = 0; i < devices.Length; i++)
         {
-            Debug.Log(devices.Length + " " + devices[i].name);
+            if (devices[i].isFrontFacing)
+            {
+                currentIndex = i;
+                break;
+            }
         }
 
-        // 웹캠 실행
-        if (camTexture != null)
-        {
-            display.texture = null;
-            camTexture.Stop();
-            camTexture = null;
-        }
         captureImage.gameObject.SetActive(false);
     }
 
@@ -52,9 +49,10 @@ public class WebCam : MonoBehaviour
         camTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
         camTexture.requestedFPS = 30;
         camTexture.requestedWidth = Screen.width;
-        display.rectTransform.localRotation = Quaternion.Euler(0, 0, 90);
+        display.rectTransform.localRotation = Quaternion.Euler(0, 180, 90);
         display.texture = camTexture;
         camTexture.Play();
+        display.gameObject.SetActive(true);
     }
 
     public void WebCamCapture()
@@ -85,6 +83,7 @@ public class WebCam : MonoBehaviour
                 rotatedIndex++;
             }
         }
+
         Texture2D rotatedTexture = new Texture2D(snap.height, snap.width);
         rotatedTexture.SetPixels32(rotatedPixels);
         rotatedTexture.Apply();
@@ -143,12 +142,6 @@ public class WebCam : MonoBehaviour
                 currentIndex = i;
                 break;
             }
-        }
-
-        if (camTexture.isPlaying)
-        {
-            camTexture.Stop();
-            camTexture = null;
         }
 
         WebCamDevice device = WebCamTexture.devices[currentIndex];
