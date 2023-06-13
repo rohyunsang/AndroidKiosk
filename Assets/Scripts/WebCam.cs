@@ -132,21 +132,4 @@ public class WebCam : MonoBehaviour
         captureImage.gameObject.SetActive(false);
     }
 
-    public void SwitchToFrontCamera()
-    {
-        WebCamDevice[] devices = WebCamTexture.devices;
-        for (int i = 0; i < devices.Length; i++)
-        {
-            if (devices[i].isFrontFacing)
-            {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        WebCamDevice device = WebCamTexture.devices[currentIndex];
-        camTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
-        display.texture = camTexture;
-        camTexture.Play();
-    }
 }
