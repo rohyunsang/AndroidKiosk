@@ -25,11 +25,13 @@ public class PhotoUpload : MonoBehaviour // capture image + db cloth image uploa
 
     IEnumerator PhotoCapture()
     {
-        byte[] imageBytes = webCam.snapSliced.EncodeToJPG();
+        byte[] imageBytes = webCam.snapRotated.EncodeToJPG();
 
-        //use debug
-        string localPath = Application.persistentDataPath + "/customer_image.jpg";
-        File.WriteAllBytes(localPath, imageBytes);
+        //use debug => Android build not using
+        //string localPath = Application.persistentDataPath + "/customer_image.jpg";
+        //File.WriteAllBytes(localPath, imageBytes);
+        
+        
         // Create a new form
         WWWForm form = new WWWForm();
 

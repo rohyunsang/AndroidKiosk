@@ -2,35 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows.WebCam;
-
-//using System.IO; // used only debug
+using UnityEngine.Android;
 
 public class WebCam : MonoBehaviour
 {
-    // webcam variables 
+    // 웹캠 변수
     public RawImage display;
 
     [SerializeField]
     public WebCamTexture camTexture;
     private int currentIndex = 0;
     public Texture2D snap;
-    public Texture2D snapSliced;
+    public Texture2D snapSlicedAndRotated;
+    public Texture2D snapRotated;
 
-    // timer variables
+    // 타이머 변수
     public Text timerText;
     int threeSecond = 3;
     public GameObject countingImage;
 
-    // photo capture checking Image varable
+    // 캡처된 이미지 확인용 변수
     public Image captureImage;
-
-    // use debug
-    // private int captureCounter = 0;
 
     void Start()
     {
-        //webCam = GameObject.Find("WebCamManager").GetComponent<WebCam>();
+        if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+            Permission.RequestUserPermission(Permission.Camera);
 
         WebCamDevice[] devices = WebCamTexture.devices;
         for (int i = 0; i < devices.Length; i++)
@@ -38,7 +35,7 @@ public class WebCam : MonoBehaviour
             Debug.Log(devices.Length + " " + devices[i].name);
         }
 
-        //webcam run 
+        // 웹캠 실행
         if (camTexture != null)
         {
             display.texture = null;
@@ -52,31 +49,49 @@ public class WebCam : MonoBehaviour
     {
         Debug.Log("WebCamPlayButtonClicked");
         WebCamDevice device = WebCamTexture.devices[currentIndex];
-        camTexture = new WebCamTexture(device.name, 1920, 1080, 30);
+        camTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
+        camTexture.requestedFPS = 30;
+        camTexture.requestedWidth = Screen.width;
+        display.rectTransform.localRotation = Quaternion.Euler(0, 0, 90);
         display.texture = camTexture;
         camTexture.Play();
     }
+
     public void WebCamCapture()
     {
-        snap = new Texture2D(camTexture.width, camTexture.height, TextureFormat.RGBA64, false);
-        Debug.Log(camTexture.width);
-        Debug.Log(camTexture.height);
+        snap = new Texture2D(camTexture.width, camTexture.height, TextureFormat.RGBA32, false);
         snap.SetPixels(camTexture.GetPixels());
         snap.Apply();
 
-        snapSliced = CropTexture2D(snap,576, 0, 768, 1024);
+        //snapSlicedAndRotated = CropTexture2D(snap, 576, 0, 768, 1024);
+        snapRotated = RotatedTexture2D(snap);
 
-        // use debug
-        // Save the snapSliced texture as a PNG file
-        byte[] bytes = snapSliced.EncodeToPNG();
-        string filePath = Application.dataPath + "/snapsliced.png";
-        System.IO.File.WriteAllBytes(filePath, bytes);
 
-        // Resize the snap texture to the desired size
         captureImage.gameObject.SetActive(true);
-        captureImage.sprite = Sprite.Create(snapSliced, new Rect(0, 0, snapSliced.width, snapSliced.height), new Vector2(0.5f, 0.5f));
+        captureImage.sprite = Sprite.Create(snap, new Rect(0, 0, snap.width, snap.height), new Vector2(0.5f, 0.5f));
         display.gameObject.SetActive(false);
     }
+
+    Texture2D RotatedTexture2D(Texture2D snap)
+    {
+        Color32[] pixels = snap.GetPixels32();
+        Color32[] rotatedPixels = new Color32[snap.height * snap.width];
+        int rotatedIndex = 0;
+        for (int i = 0; i < snap.width; i++)
+        {
+            for (int j = snap.height - 1; j >= 0; j--)
+            {
+                rotatedPixels[rotatedIndex] = pixels[i + j * snap.width];
+                rotatedIndex++;
+            }
+        }
+        Texture2D rotatedTexture = new Texture2D(snap.height, snap.width);
+        rotatedTexture.SetPixels32(rotatedPixels);
+        rotatedTexture.Apply();
+        return rotatedTexture;
+    }
+
+    /*
     Texture2D CropTexture2D(Texture2D originalTexture, int startX, int startY, int width, int height)
     {
         Color[] pixels = originalTexture.GetPixels(startX, startY, width, height);
@@ -85,20 +100,21 @@ public class WebCam : MonoBehaviour
         croppedTexture.Apply();
         return croppedTexture;
     }
+    */
 
-    public void WebCamCaptureButton() // using button  
+
+    public void WebCamCaptureButton()
     {
         display.gameObject.SetActive(true);
         captureImage.gameObject.SetActive(false);
-        threeSecond = 3;  // 타이머 3초로 만들기 
+        threeSecond = 3;
         countingImage.SetActive(true);
         StartCoroutine(CountingThreeSecond());
         Invoke("WebCamCapture", 3f);
-
     }
 
     IEnumerator CountingThreeSecond()
-    {  // 3 second waiting fuc
+    {
         for (int i = 0; i < 3; i++)
         {
             timerText.text = threeSecond.ToString();
@@ -106,14 +122,38 @@ public class WebCam : MonoBehaviour
             threeSecond--;
         }
         timerText.fontSize = 20;
-        timerText.text = "Capture!";
+        timerText.text = "캡처!";
     }
 
     public void WebCamStopButton()
-    {   // panel close button fuc 
+    {
         countingImage.SetActive(false);
         camTexture.Stop();
-        threeSecond = 3;  // timer set 3 second
+        threeSecond = 3;
         captureImage.gameObject.SetActive(false);
+    }
+
+    public void SwitchToFrontCamera()
+    {
+        WebCamDevice[] devices = WebCamTexture.devices;
+        for (int i = 0; i < devices.Length; i++)
+        {
+            if (devices[i].isFrontFacing)
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (camTexture.isPlaying)
+        {
+            camTexture.Stop();
+            camTexture = null;
+        }
+
+        WebCamDevice device = WebCamTexture.devices[currentIndex];
+        camTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
+        display.texture = camTexture;
+        camTexture.Play();
     }
 }

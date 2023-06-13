@@ -24,7 +24,7 @@ public class PanelManager : MonoBehaviour
 
     public void UpShoppingBasketPanel(){
         ShoppingBasketPanelOriginPosition = ShoppingBasketPanel.transform.position;
-        ShoppingBasketPanel.transform.position = new Vector3(0,2800,0);
+        ShoppingBasketPanel.transform.position = new Vector3(0,5600,0);
     }
     public void DownShoppingBasketPanel(){
         ShoppingBasketPanel.transform.position = ShoppingBasketPanelOriginPosition;
