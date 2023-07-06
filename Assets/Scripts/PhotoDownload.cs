@@ -26,6 +26,7 @@ public class PhotoDownload : MonoBehaviour //결과 이미지 다운로드
 
             //texture = RotatedTexture2D(texture);
             // Assign the downloaded texture to the RawImage component
+            
             resultImage.texture = texture;
         }
         else
