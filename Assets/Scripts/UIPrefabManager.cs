@@ -22,11 +22,9 @@ public class UIPrefabManager : MonoBehaviour // Cloth Product PrefabManager
 
     public void PrefabInstantiate()
     {
-        float offSet = 0.0f;
-        for (int i = 0; i < 10; i += 2)
+        for (int i = 0; i < 10; i++)
         {
-            StartCoroutine(DelayedAPIDownload(i, offSet));
-            offSet += 0.8f;
+            APIDownload(i);
         }
     }
     IEnumerator APIDownload(int idx)
@@ -41,7 +39,7 @@ public class UIPrefabManager : MonoBehaviour // Cloth Product PrefabManager
             // Accessing the Image component of the LeftImage object
             leftImage = leftImageTransform.GetComponent<Image>();
             rightImage = rightImageTransform.GetComponent<Image>();
-            if (leftImage != null && rightImage != null)
+            if (leftImage != null)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -63,8 +61,7 @@ public class UIPrefabManager : MonoBehaviour // Cloth Product PrefabManager
 
                         // Create a sprite from the downloaded texture
                         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                        if (idx % 2 == 0)
-                        {
+                        
                             leftImageTransform.GetComponentInChildren<ImageURL>().imgUrl = "http://220.149.231.136:8051/" + clothesManager.clothes[idx].imgUrl;
                             leftImage.sprite = sprite;
 
@@ -91,36 +88,8 @@ public class UIPrefabManager : MonoBehaviour // Cloth Product PrefabManager
                                 leftNameText.text = clothesManager.clothes[idx].name;
                                 leftPriceText.text = clothesManager.clothes[idx].price.ToString();
                             }
-                        }
-                        else
-                        {
-                            rightImageTransform.GetComponentInChildren<ImageURL>().imgUrl = "http://220.149.231.136:8051/" + clothesManager.clothes[idx].imgUrl;
-                            rightImage.sprite = sprite;
-
-                            Text[] textComponents = rightImageTransform.GetComponentsInChildren<Text>();
-
-                            Text leftNameText = null;
-                            Text leftPriceText = null;
-
-                            foreach (Text textComponent in textComponents)
-                            {
-                                if (textComponent.name == "NameText")
-                                {
-                                    leftNameText = textComponent;
-                                }
-                                else if (textComponent.name == "PriceText")
-                                {
-                                    leftPriceText = textComponent;
-                                }
-                            }
-
-                            if (leftNameText != null && leftPriceText != null)
-                            {
-                                // Access and modify the properties of NameText and PriceText
-                                leftNameText.text = clothesManager.clothes[idx].name;
-                                leftPriceText.text = clothesManager.clothes[idx].price.ToString();
-                            }
-                        }
+                        
+                        
                     }
                     else
                     {
@@ -133,9 +102,5 @@ public class UIPrefabManager : MonoBehaviour // Cloth Product PrefabManager
 
     }
 
-    IEnumerator DelayedAPIDownload(int idx, float offSet)
-    {
-        yield return new WaitForSeconds(offSet);
-        StartCoroutine(APIDownload(idx));
-    }
+
 }
