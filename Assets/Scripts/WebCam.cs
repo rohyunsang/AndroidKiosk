@@ -32,11 +32,17 @@ public class WebCam : MonoBehaviour
         WebCamDevice[] devices = WebCamTexture.devices;
         for (int i = 0; i < devices.Length; i++)
         {
-            if (devices[i].isFrontFacing)
+            if (devices[i].isFrontFacing) // 전면 카메라를 먼저 찾습니다.
             {
                 currentIndex = i;
                 break;
             }
+        }
+
+        // 전면 카메라를 찾지 못한 경우, 후면 카메라를 사용하도록 설정합니다.
+        if (currentIndex == -1 && devices.Length > 0)
+        {
+            currentIndex = 0;
         }
 
         captureImage.gameObject.SetActive(false);
@@ -49,7 +55,9 @@ public class WebCam : MonoBehaviour
         camTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
         camTexture.requestedFPS = 30;
         camTexture.requestedWidth = Screen.width;
-        display.rectTransform.localRotation = Quaternion.Euler(0, 180, 90);
+
+        // 카메라의 기본 회전 각도를 확인하고, RawImage의 회전을 조정합니다.
+
         display.texture = camTexture;
         camTexture.Play();
         display.gameObject.SetActive(true);
@@ -90,18 +98,6 @@ public class WebCam : MonoBehaviour
         return rotatedTexture;
     }
 
-    /*
-    Texture2D CropTexture2D(Texture2D originalTexture, int startX, int startY, int width, int height)
-    {
-        Color[] pixels = originalTexture.GetPixels(startX, startY, width, height);
-        Texture2D croppedTexture = new Texture2D(width, height);
-        croppedTexture.SetPixels(pixels);
-        croppedTexture.Apply();
-        return croppedTexture;
-    }
-    */
-
-
     public void WebCamCaptureButton()
     {
         display.gameObject.SetActive(true);
@@ -124,7 +120,7 @@ public class WebCam : MonoBehaviour
         timerText.text = "캡처!";
     }
 
-    public void WebCamStopButton()
+    public void WebCamStopButton() // using Btn : CloseBtn in Virtual Fitting Panel
     {
         countingImage.SetActive(false);
         camTexture.Stop();
