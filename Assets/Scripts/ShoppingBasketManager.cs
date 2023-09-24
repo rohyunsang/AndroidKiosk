@@ -23,7 +23,7 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
         mainPanelObject = GameObject.Find("MainPanel");
 
         // Hierachy에서 Content 오브젝트를 찾고 해당 Transform을 contentTransform에 할당
-        Transform content = shoppingBasketPanel.transform.Find("Scroll View/Viewport/Content");
+        Transform content = GameObject.Find("Scroll View Basket").GetComponent<Transform>();
         if (content != null)
         {
             contentTransform = content.transform;
