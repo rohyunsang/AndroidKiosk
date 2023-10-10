@@ -8,7 +8,6 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
     public GameObject clothCopy; //UI prefab
     public Transform contentTransform;  // Parent Ojbect current => Content
     public Image clothImage;
-    public GameObject basketCounterTextObject;
 
     //PriceText Variable
     public GameObject currentPriceManager;
@@ -18,12 +17,10 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
     // Start is called before the first frame update
     void Start()
     {
-        basketCounterTextObject = GameObject.Find("BasketCounterText");
-        shoppingBasketPanel = GameObject.Find("ShoppingBasketPanel");
         mainPanelObject = GameObject.Find("MainPanel");
 
         // Hierachy에서 Content 오브젝트를 찾고 해당 Transform을 contentTransform에 할당
-        Transform content = GameObject.Find("Scroll View Basket").GetComponent<Transform>();
+        Transform content = GameObject.Find("BasketContent").GetComponent<Transform>();
         if (content != null)
         {
             contentTransform = content.transform;
@@ -33,13 +30,10 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
         currentPriceManager = GameObject.Find("CurrentPriceManager");
 
     }
-    public void AddToShoppingBasketButton()
+    public void AddToShoppingBasketButton()  //using product sample prefab button
     {
         string objectName = clothImage.name;
         InstantiateToShoppingBasket(objectName);
-        basketCounterTextObject.GetComponent<BasketCounter>().basketCount++; // basketCounter
-        basketCounterTextObject.GetComponent<Text>().text = basketCounterTextObject.GetComponent<BasketCounter>().basketCount.ToString();
-
 
         // 상품이 장바구니에 담겼습니다. 텍스트 2초간 출력
         StartCoroutine(ShowMessageCoroutine("상품이 장바구니에 담겼습니다.", 2f, 44));
@@ -55,8 +49,8 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
         {
             if (childText.name == "PriceText")
             {
-                int clothCopyPrice = int.Parse(childText.text);
-                currentPriceManager.GetComponent<CurrentPrice>().CurrnetPriceUpdate(clothCopyPrice);
+                //int clothCopyPrice = int.Parse(childText.text);
+                //currentPriceManager.GetComponent<CurrentPrice>().CurrnetPriceUpdate(clothCopyPrice);
                 break;
             }
         }
@@ -113,8 +107,7 @@ public class ShoppingBasketManager : MonoBehaviour  // use '담기' button
             }
 
             Destroy(closeButton.transform.parent.gameObject);
-            basketCounterTextObject.GetComponent<BasketCounter>().basketCount--;
-            basketCounterTextObject.GetComponent<Text>().text = basketCounterTextObject.GetComponent<BasketCounter>().basketCount.ToString();
+            
         });
 
         uiObject.transform.SetAsFirstSibling(); // 이미지 위로 닫기 버튼이 표시되도록 설정
