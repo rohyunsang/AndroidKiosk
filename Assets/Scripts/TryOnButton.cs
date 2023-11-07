@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TryOnButton : MonoBehaviour
+public class TryOnButton : MonoBehaviour  // Webcam TryOn
 {
     public WebCam webCam;
     public PanelManager panelManager;
@@ -20,6 +20,6 @@ public class TryOnButton : MonoBehaviour
     public void OnPrefabButton(){  // using Prefab : ProductSample
         virtualPanel.SetActive(true);
         webCam.WebCamPlayButton();
-        GameObject.Find("ImageUploadBtn").GetComponent<PhotoUpload>().imgUrl = transform.GetComponent<ImageURL>().imgUrl;
+        //GameObject.Find("ImageUploadBtn").GetComponent<PhotoUpload>().imgUrl = transform.GetComponent<ImageURL>().imgUrl;
     } 
 }

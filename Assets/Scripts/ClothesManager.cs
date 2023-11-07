@@ -26,8 +26,8 @@ public class ClothesManager : MonoBehaviour
 
     private void Start()
     {
-        GameObject uIPrefabManagerObject = GameObject.Find("UIPrefabManager");
-        uIPrefabManager = uIPrefabManagerObject.GetComponent<UIPrefabManager>();
+        //GameObject uIPrefabManagerObject = GameObject.Find("UIPrefabManager");
+        //uIPrefabManager = uIPrefabManagerObject.GetComponent<UIPrefabManager>();
         StartCoroutine(APIDownload());
     }
 
